@@ -1,0 +1,44 @@
+# ===== Hemligheter och personlig config (ALDRIG publikt) =====
+plexus-config.json
+strom-config.json
+.env
+*.jks
+*.keystore
+local.properties
+
+# ===== Personlig data från servern (affischer = upphovsrättsskyddade, historik = privat) =====
+server/data/
+**/server/data/
+
+# ===== Byggartefakter / genererat =====
+node_modules/
+build/
+.gradle/
+.cxx/
+dist/
+web/
+release/
+*.apk
+*.aab
+*.exe
+*.dex
+*.log
+
+# Capacitor genererar dessa vid "npx cap sync"
+**/android/app/src/main/assets/public/
+**/android/app/src/main/assets/capacitor.config.json
+**/android/app/src/main/assets/capacitor.plugins.json
+**/android/app/src/main/res/xml/config.xml
+**/android/capacitor-cordova-android-plugins/
+
+# ===== IDE =====
+.idea/
+*.iml
+.vscode/
+
+# ===== Windows/Mac =====
+Thumbs.db
+.DS_Store
+
+# ===== Torrent-tung gammal serverfil (ej en del av den slimmade appen) =====
+plexus-server.cjs

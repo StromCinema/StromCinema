@@ -1,0 +1,324 @@
+/* =====================================================================
+   PHYSICAL DISC CASE  –  a real 3D box built from real faces
+   ---------------------------------------------------------------------
+   Real Amaray Blu-ray / 4K UHD case:  135 mm wide x 171 mm tall x 14 mm thick.
+   Everything below is derived from --w (case width), so the case scales as
+   one rigid object.
+
+   IMPORTANT RULES for anything inside a `preserve-3d` element:
+   - never put filter / opacity<1 / isolation / mask / clip-path / overflow
+     on .case or .shelf - they silently flatten the whole 3D model.
+   - dim / tint with overlay pseudo-elements on the faces instead.
+   ===================================================================== */
+
+/* ---------- stage / camera ---------- */
+.stage{perspective:1500px;perspective-origin:50% 36%}
+
+/* ---------- size + pose (set on .shelf, inherited by every case) ---------- */
+.shelf{
+  --ratio:1.2667;                       /* case height / width      (171 / 135) */
+  --depth-ratio:.1037;                  /* case thickness / width   ( 14 / 135) */
+  --h:min(41vh,28vw);
+  --refl-len:26%;
+  --w:calc(var(--h) / var(--ratio));
+  --d:calc(var(--w) * var(--depth-ratio));
+  --b:calc(var(--d) * .13);             /* rounded spine edge (one chamfer facet) */
+  --rim:calc(var(--w) * .011);          /* clear plastic rim around the paper */
+
+  /* default pose = "fan": classic coverflow, cases turn their face to the centre */
+  --angle:52deg;
+  --gap0:calc(var(--w) * .92);          /* centre -> first neighbour           */
+  --step:calc(var(--w) * .40);          /* spacing between further neighbours  */
+  --push:calc(var(--w) * .38);          /* neighbours pushed back (depth)      */
+  --zstep:calc(var(--w) * .07);         /* extra push per further neighbour    */
+  --lift:calc(var(--w) * .16);          /* centre case comes forward           */
+  --center-yaw:0deg;                    /* e.g. 7deg turns the centre case slightly so its spine shows */
+}
+/* "shelf" pose: every case turned so its SPINE faces you (like a real shelf) */
+.shelf[data-pose="shelf"]{
+  --angle:71deg;
+  --gap0:calc(var(--w) * .74);
+  --step:calc(var(--w) * .205);
+  --push:calc(var(--w) * .30);
+  --zstep:calc(var(--w) * .05);
+}
+.shelf[data-pose="fan"]   .case{--rot:calc(var(--dir) * -1)}
+.shelf[data-pose="shelf"] .case{--rot:var(--side)}
+
+
+/* ---------- the case (3D container) ---------- */
+.case{
+  --shade:calc(var(--depth) * .095);    /* distance dimming, applied per face */
+  position:absolute;left:50%;top:50%;
+  width:var(--w);height:var(--h);
+  margin:0;padding:0;border:0;background:none;
+  transform-style:preserve-3d;
+  transform:
+    translate(-50%,-50%)
+    translate3d(
+      calc(var(--dir) * (var(--gap0) + (var(--depth) - 1) * var(--step))),
+      0,
+      calc((1 - var(--side)) * var(--lift) - var(--side) * (var(--push) + (var(--depth) - 1) * var(--zstep)) + var(--flip, 0) * var(--w) * .5)
+    )
+    rotateY(calc(var(--rot) * var(--angle) + (1 - var(--side)) * var(--center-yaw) + var(--flip, 0) * 180deg));
+  transition:transform calc(var(--speed) * .42) cubic-bezier(.2,.8,.2,1);
+  will-change:transform;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* case plastic colours */
+.case.bluray{--shell:#0a58c2;--shell-hi:#4a9bf5;--shell-lo:#04316f;--sheen:rgba(150,200,255,.5)}
+.case.uhd   {--shell:#15161c;--shell-hi:#4d505e;--shell-lo:#050507;--sheen:rgba(255,255,255,.34)}
+
+/* artwork colour themes (same palette as before) */
+.case{--t1:#18595b;--t2:#102f3e 49%;--t3:#04151d;--orb:#7e74ff}
+.tone-teal  {--t1:#18595b;--t2:#102f3e 49%;--t3:#04151d;--orb:#7e74ff}
+.tone-gold  {--t1:#765124;--t2:#302016 52%;--t3:#090807;--orb:#a2e06b}
+.tone-rose  {--t1:#642c58;--t2:#40162c 55%;--t3:#180714;--orb:#d46ba9}
+.tone-blue  {--t1:#193b73;--t2:#142044 53%;--t3:#070c1b;--orb:#5a8bdc}
+.tone-navy  {--t1:#17485e;--t2:#092534 58%;--t3:#040d13;--orb:#5a8bdc}
+.tone-amber {--t1:#72502c;--t2:#372112 58%;--t3:#0a0806;--orb:#a2e06b}
+.tone-violet{--t1:#4a316a;--t2:#251333 60%;--t3:#0a0612;--orb:#7e74ff}
+
+/* ---------- generic face ---------- */
+.face{position:absolute;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.face::after{              /* distance dimming overlay (replaces filter:brightness) */
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:#06040e;opacity:var(--shade);transition:opacity calc(var(--speed) * .42);
+}
+
+/* ---------- FRONT (cover under clear plastic) ---------- */
+.f-front{
+  left:var(--b);right:0;top:0;bottom:0;
+  transform:translateZ(calc(var(--d) / 2));
+  display:flex;flex-direction:column;
+  padding:0 var(--rim);
+  background:var(--shell);
+  border-radius:var(--arc-rx,var(--round)) var(--round) 0 0 / var(--arc-ry,var(--round)) var(--round) 0 0;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.20);
+}
+.f-front > .case-header,.f-front > .case-bottom{margin:0 calc(var(--rim) * -1)}
+.case-header{
+  height:9.5%;min-height:20px;flex-shrink:0;display:flex;align-items:center;gap:.35em;
+  padding:0 calc(var(--w) * .05);
+  background:var(--shell);color:#fff;
+  font-size:calc(var(--w) * .046);letter-spacing:.13em;white-space:nowrap;
+}
+.uhd .case-header{background:#101116;border-bottom:calc(var(--w) * .010) solid #d7d7d7;letter-spacing:0;gap:.28em}
+.uhd .case-header b{font-size:1.35em;border:1px solid #aaa;padding:0 .12em;letter-spacing:-.05em}
+.uhd .case-header span{font-size:.72em}
+.case-header small{font-size:.55em;letter-spacing:0;margin-left:auto;opacity:.9}
+
+.poster-art{
+  position:relative;flex:1;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;
+  padding:0 7% 7%;text-align:left;
+  background:linear-gradient(155deg,var(--t1),var(--t2),var(--t3));
+}
+.poster-art.has-poster{background-position:center;background-size:cover}
+.poster-art.has-poster:before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.83),transparent 62%)}
+.orb{position:absolute;width:36%;aspect-ratio:1;border-radius:50%;background:var(--orb);top:12%;right:20%;box-shadow:0 0 45px rgba(132,117,255,.18)}
+.shape{position:absolute;width:50%;height:36%;right:8%;bottom:15%;background:rgba(0,0,0,.55);clip-path:polygon(0 100%,35% 15%,55% 68%,74% 30%,100% 100%)}
+.art-lines{position:absolute;inset:8% 12% 25%;background:repeating-radial-gradient(circle at 50% 38%,transparent 0 12px,rgba(255,160,173,.27) 13px 15px,transparent 16px 27px);-webkit-mask-image:linear-gradient(to bottom,#000,transparent);mask-image:linear-gradient(to bottom,#000,transparent)}
+.art-title{position:relative;font-family:'Big Shoulders Display',Impact,sans-serif;font-weight:900;text-transform:uppercase;font-size:calc(var(--w) * .165);line-height:.83;letter-spacing:-.035em;text-wrap:balance;overflow-wrap:anywhere;text-shadow:0 2px 8px rgba(0,0,0,.35);max-height:45%;overflow:hidden}
+.art-tag{position:relative;font-size:calc(var(--w) * .036);line-height:1.3;margin-top:.9em;max-height:2.6em;overflow:hidden;color:#e8e3ed}
+.art-footer{position:relative;display:flex;align-items:center;justify-content:space-between;font-size:calc(var(--w) * .034);margin-top:1.1em}
+.art-footer b{font-size:.95em;font-weight:500;border:1px solid rgba(255,255,255,.8);padding:.25em .6em}
+.case-bottom{height:3.2%;min-height:8px;flex-shrink:0;background:var(--shell);box-shadow:inset 0 2px 2px rgba(255,255,255,.18)}
+.uhd .case-bottom{background:#08090c}
+
+/* clear plastic: soft diagonal sheen + hot edge */
+.gloss{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(112deg,transparent 28%,rgba(255,255,255,.11) 40%,rgba(255,255,255,.03) 50%,transparent 58%),
+    linear-gradient(180deg,rgba(255,255,255,.10),transparent 18%),
+    linear-gradient(90deg,rgba(255,255,255,.12) 0,transparent 5%,transparent 96%,rgba(255,255,255,.14) 100%);
+}
+
+/* ---------- BACK ---------- */
+.f-back{
+  left:var(--b);right:0;top:0;bottom:0;
+  transform:rotateY(180deg) translateZ(calc(var(--d) / 2));
+  background:linear-gradient(160deg,var(--shell-hi),var(--shell) 28%,var(--shell-lo));
+  border-radius:var(--round) var(--arc-rx,var(--round)) 0 0 / var(--round) var(--arc-ry,var(--round)) 0 0;
+}
+.f-back::before{ /* printed back cover under clear plastic */
+  content:"";position:absolute;inset:var(--rim);border-radius:1px;
+  background:
+    /* barcode */
+    repeating-linear-gradient(90deg,#fff 0 1px,transparent 1px 2px,#fff 2px 4px,transparent 4px 5px) calc(100% - 7%) 94% / 22% 4.5% no-repeat,
+    /* spec strip */
+    linear-gradient(90deg,rgba(255,255,255,.55),rgba(255,255,255,.55)) 7% 94% / 55% 4.5% no-repeat,
+    /* screenshots row */
+    linear-gradient(90deg,rgba(255,255,255,.22) 0 31%,transparent 31% 34.5%,rgba(255,255,255,.22) 34.5% 65.5%,transparent 65.5% 69%,rgba(255,255,255,.22) 69% 100%) 7% 62% / 86% 14% no-repeat,
+    /* synopsis lines */
+    repeating-linear-gradient(180deg,rgba(255,255,255,.55) 0 1.5px,transparent 1.5px 7px) 7% 22% / 86% 28% no-repeat,
+    /* title */
+    linear-gradient(90deg,rgba(255,255,255,.9),rgba(255,255,255,.9)) 7% 11% / 46% 3.2% no-repeat,
+    linear-gradient(160deg,var(--t1),var(--t2),var(--t3));
+  opacity:.95;
+}
+.f-back::after{z-index:2}
+
+/* ---------- SPINE: flat middle + two rounded-edge facets ---------- */
+.f-spine{
+  left:calc((var(--d) - 2 * var(--b)) / -2);
+  width:calc(var(--d) - 2 * var(--b));
+  top:var(--round);bottom:0;      /* stops where the rounded top corner starts */
+  transform:rotateY(-90deg);
+  display:flex;flex-direction:column;
+  background:var(--shell);
+}
+.f-bevel-f,.f-bevel-b{
+  left:calc(var(--b) * -.70711);width:calc(var(--b) * 1.41421);top:0;bottom:0;
+  background:linear-gradient(180deg,var(--shell-hi),var(--shell) 12%,var(--shell) 88%,var(--shell-lo));
+}
+.f-bevel-f{clip-path:var(--bev-f,none);transform:translate3d(calc(var(--b) * .5),0,calc(var(--d) / 2 - var(--b) * .5)) rotateY(-45deg)}
+.f-bevel-b{clip-path:var(--bev-b,none);transform:translate3d(calc(var(--b) * .5),0,calc(var(--d) / -2 + var(--b) * .5)) rotateY(-135deg)}
+.f-bevel-f::before,.f-bevel-b::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.55),rgba(255,255,255,.05))}
+
+/* spine artwork (paper insert seen through the clear spine window) */
+.sp-top,.sp-foot{flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff}
+.sp-top{
+  flex-direction:column;gap:.5em;height:17%;padding-top:.35em;
+  font-size:calc(var(--d) * .30);font-weight:800;letter-spacing:.06em;
+  background:var(--shell);
+}
+.sp-top b,.sp-top i{writing-mode:vertical-rl;font-style:normal;white-space:nowrap}
+.uhd .sp-top{height:21%;border-bottom:calc(var(--d) * .06) solid #d7d7d7}
+.uhd .sp-top b{writing-mode:horizontal-tb;border:1px solid #bbb;padding:0 .2em;font-size:1.5em;letter-spacing:-.04em;line-height:1.1}
+.uhd .sp-top i{font-size:.82em}
+.sp-title{
+  flex:1;min-height:0;display:flex;align-items:flex-start;justify-content:flex-start;overflow:hidden;
+  padding:calc(var(--d) * .20) 0 calc(var(--d) * .12);
+  background:linear-gradient(90deg,var(--t3),var(--t1) 38%,var(--t2) 62%,var(--t3));
+  color:#fff;
+}
+.sp-title span{
+  display:block;width:100%;writing-mode:vertical-rl;       /* reads top -> bottom, like real Blu-ray spines */
+  text-align:start;font-family:'Big Shoulders Display',Impact,sans-serif;font-weight:900;text-transform:uppercase;
+  font-size:calc(var(--d) * .50);line-height:1;letter-spacing:.045em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-shadow:0 1px 2px rgba(0,0,0,.6);
+}
+.sp-foot{flex-direction:column;gap:.5em;height:13%;padding-bottom:.3em;font-size:calc(var(--d) * .27);background:var(--shell)}
+.sp-foot b{font-weight:600;border:1px solid rgba(255,255,255,.8);padding:.05em .35em;line-height:1.2}
+.sp-foot i{font-style:normal;opacity:.85;writing-mode:vertical-rl;letter-spacing:.06em}
+.f-spine::before{ /* round-spine highlight running down the plastic */
+  content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:linear-gradient(90deg,rgba(0,0,0,.40) 0,rgba(255,255,255,.04) 14%,var(--sheen) 30%,rgba(255,255,255,.04) 48%,rgba(0,0,0,.05) 80%,rgba(0,0,0,.45) 100%);
+  mix-blend-mode:normal;opacity:.55;
+}
+
+/* ---------- RIGHT (open) EDGE ---------- */
+.f-edge{
+  left:calc(var(--w) - var(--d) / 2);width:var(--d);top:var(--round);bottom:0;
+  transform:rotateY(90deg);
+  background:
+    linear-gradient(90deg,
+      var(--shell-hi) 0,var(--shell) 7%,var(--shell-lo) 9.5%,var(--shell) 12%,
+      var(--shell) 88%,var(--shell-lo) 90.5%,var(--shell) 93%,var(--shell-hi) 100%),
+    var(--shell);
+}
+.f-edge::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.22),transparent 14%,transparent 86%,rgba(0,0,0,.25))}
+
+/* ---------- TOP / BOTTOM ---------- */
+.f-top,.f-bottom{
+  left:0;width:var(--w);height:var(--d);
+  background:
+    linear-gradient(180deg,
+      var(--shell-hi) 0,var(--shell) 8%,var(--shell-lo) 11%,var(--shell) 14%,
+      var(--shell) 86%,var(--shell-lo) 89%,var(--shell) 92%,var(--shell-hi) 100%),
+    var(--shell);
+  clip-path:polygon(var(--b) 0,100% 0,100% 100%,var(--b) 100%,0 calc(100% - var(--b)),0 var(--b));
+}
+.f-top   {top:calc(var(--d) / -2);transform:rotateX(90deg);left:var(--round);width:calc(var(--w) - 2 * var(--round));clip-path:none}
+.f-bottom{top:calc(var(--h) - var(--d) / 2);transform:rotateX(-90deg)}
+.f-top::after{background:#fff;opacity:calc(.10 + var(--shade))}   /* top face catches the light */
+.f-bottom::after{opacity:calc(.45 + var(--shade))}
+
+/* ---------- ROUNDED TOP CORNERS (strips of a quarter circle, see cornerStrips in main.jsx) ---------- */
+.f-arc{
+  height:var(--d);
+  background:
+    linear-gradient(180deg,
+      var(--shell-hi) 0,var(--shell) 8%,var(--shell-lo) 11%,var(--shell) 14%,
+      var(--shell) 86%,var(--shell-lo) 89%,var(--shell) 92%,var(--shell-hi) 100%),
+    var(--shell);
+}
+.f-arc::before{          /* lit from above: grows from the side faces towards the top face */
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:#fff;opacity:calc(var(--k) * .10);
+}
+
+/* ---------- REFLECTION on the glossy floor ----------
+   A mirrored copy of the visible faces just under the case (mirror line = the case's bottom edge),
+   faded out with a mask. Mirroring flips which side counts as "front", so these faces are always
+   drawn (backface-visibility:visible); main.jsx only renders the ones whose original is visible. */
+.f-rfront,.f-rspine,.f-redge,.f-rbevel-f,.f-rbevel-b{
+  backface-visibility:visible;-webkit-backface-visibility:visible;pointer-events:none;
+  -webkit-mask-image:linear-gradient(to top,rgba(0,0,0,var(--refl,.42)),transparent var(--refl-len,34%));
+          mask-image:linear-gradient(to top,rgba(0,0,0,var(--refl,.42)),transparent var(--refl-len,34%));
+}
+.f-rfront{top:var(--h);bottom:auto;height:var(--h);transform:translateZ(calc(var(--d) / 2)) scaleY(-1)}
+.f-rspine{top:var(--h);bottom:auto;height:calc(var(--h) - var(--round));transform:rotateY(-90deg) scaleY(-1)}
+.f-redge{top:var(--h);bottom:auto;height:calc(var(--h) - var(--round));transform:rotateY(90deg) scaleY(-1)}
+.f-rbevel-f{top:var(--h);bottom:auto;height:var(--h);transform:translate3d(calc(var(--b) * .5),0,calc(var(--d) / 2 - var(--b) * .5)) rotateY(-45deg) scaleY(-1)}
+.f-rbevel-b{top:var(--h);bottom:auto;height:var(--h);transform:translate3d(calc(var(--b) * .5),0,calc(var(--d) / -2 + var(--b) * .5)) rotateY(-135deg) scaleY(-1)}
+
+
+/* ---------- ground contact shadow ---------- */
+.floor{
+  position:absolute;left:calc(var(--w) * -.06);width:calc(var(--w) * 1.12);
+  top:calc(var(--h) - var(--d) * .2);height:calc(var(--d) * 2.4);
+  transform:translateY(calc(var(--d) * .05)) rotateX(90deg);
+  background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,.45) 0,rgba(0,0,0,.20) 42%,transparent 72%);
+  pointer-events:none;
+}
+
+
+/* ---- Cover fit (data-fit on .shelf) ---- */
+/* No dark tint over real covers. */
+.poster-art.has-poster:before{display:none}
+.shelf[data-fit="fill"] .poster-art.has-poster{background-size:cover;background-position:center}
+.shelf[data-fit="stretch"] .poster-art.has-poster{background-size:100% 100%;background-position:center;background-repeat:no-repeat}
+/* Fit: the whole cover shows; the sides are filled with a blurred, darker copy. */
+.shelf[data-fit="fit"] .poster-art.has-poster:before,
+.shelf[data-fit="fit"] .poster-art.has-poster:after{content:"";display:block;position:absolute;inset:0;background-image:inherit;background-position:center;background-repeat:no-repeat}
+.shelf[data-fit="fit"] .poster-art.has-poster:before{background-size:cover;filter:blur(calc(var(--w) * .035)) brightness(.7);transform:scale(1.3)}
+.shelf[data-fit="fit"] .poster-art.has-poster:after{background-size:contain}
+
+/* ---- Smooth mode (default on TV): fewer animating layers ---- */
+.shelf[data-quality="smooth"] .face::after{display:none}                       /* no per-face dimming overlay ... */
+.shelf[data-quality="smooth"] .f-front::after,
+.shelf[data-quality="smooth"] .f-spine::after,
+.shelf[data-quality="smooth"] .f-top::after{display:block;transition:none}      /* ... except on the big visible faces */
+.shelf[data-quality="smooth"] .gloss{display:none}
+
+.shelf[data-quality="smooth"] .case{transition-timing-function:cubic-bezier(.35,.1,.25,1)}   /* less front-loaded: motion stays visible even if frames drop */
+
+
+/* ---------- INFO side: the centre case turned round (synopsis, cast, trailer) ---------- */
+.case.flipped{transition-duration:calc(var(--speed) * .75)}
+.f-info{
+  left:var(--b);right:0;top:0;bottom:0;
+  transform:rotateY(180deg) translateZ(calc(var(--d) / 2));
+  background:var(--shell);
+  border-radius:var(--round) var(--arc-rx,var(--round)) 0 0 / var(--round) var(--arc-ry,var(--round)) 0 0;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);
+}
+.in-card{
+  position:absolute;inset:var(--rim);display:flex;flex-direction:column;
+  padding:calc(var(--w) * .055) calc(var(--w) * .06) calc(var(--w) * .05);
+  background:linear-gradient(165deg,#241848,#140d2a 55%,#0b0718);
+  color:#e9e4fb;font-family:'Instrument Sans',sans-serif;
+}
+.in-scroll{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:calc(var(--w) * .014);
+  -webkit-mask-image:linear-gradient(180deg,#000 88%,transparent);mask-image:linear-gradient(180deg,#000 88%,transparent)}
+.in-title{font:900 calc(var(--w) * .105)/1 'Big Shoulders Display',sans-serif;letter-spacing:.01em;color:#fff;text-transform:uppercase}
+.in-meta{font-size:calc(var(--w) * .036);font-weight:600;color:#b3a8d4;letter-spacing:.05em;margin-bottom:calc(var(--w) * .01)}
+.in-tagline{font-size:calc(var(--w) * .038);color:#cfc6f2;margin:calc(var(--w) * .01) 0}
+.in-h{margin-top:calc(var(--w) * .03);font-size:calc(var(--w) * .028);font-weight:700;letter-spacing:.2em;color:#9d8aff}
+.in-text{font-size:calc(var(--w) * .04);line-height:1.42;font-weight:500;color:#ece8fb}
+.in-trailer{flex-shrink:0;margin-top:calc(var(--w) * .035);height:calc(var(--w) * .115);display:flex;align-items:center;justify-content:center;
+  border-radius:999px;font-size:calc(var(--w) * .043);font-weight:700;background:linear-gradient(135deg,#6c48ec,#4a29b8);color:#fff;border:1px solid #8668f5}
+.in-trailer.is-focus{background:#fff;color:#1a1033;border-color:#fff;box-shadow:0 0 0 calc(var(--w) * .008) rgba(157,138,255,.7)}

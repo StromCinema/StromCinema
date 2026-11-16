@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Place this file at:
+  android/app/src/main/res/xml/network_security_config.xml
+
+  And make sure AndroidManifest.xml <application> tag has:
+    android:usesCleartextTraffic="true"
+    android:networkSecurityConfig="@xml/network_security_config"
+-->
+<network-security-config>
+  <!-- Allow cleartext HTTP to all destinations (LAN IPs for subnet scanner) -->
+  <base-config cleartextTrafficPermitted="true">
+    <trust-anchors>
+      <certificates src="system" />
+    </trust-anchors>
+  </base-config>
+</network-security-config>

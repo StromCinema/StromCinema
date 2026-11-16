@@ -1,0 +1,5 @@
+OPTIONAL: ffmpeg.exe (audio conversion for Android TV)
+Put ffmpeg.exe in this folder (next to Strom.exe) if you want TVs that cannot play TrueHD / DTS-HD
+to get Dolby Digital 5.1 sound instead of silence. Without it, everything else works as before.
+Use a GPL "essentials" build from https://www.gyan.dev/ffmpeg/builds/ (only ffmpeg.exe is needed).
+Converted copies are stored in the "converted" folder in the Strom data folder (max 2 films, oldest deleted).

@@ -1,0 +1,12 @@
+{
+  "appId": "com.strom.cinema",
+  "appName": "Strom Cinema",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": true,
+    "backgroundColor": "#0c0918"
+  },
+  "server": {
+    "cleartext": true
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "libraryPaths": [
+    { "path": "C:\\Path\\To\\Movies", "category": "Movies" },
+    { "path": "C:\\Path\\To\\TV", "category": "TV Shows" }
+  ],
+  "tmdbApiKey": "PUT_YOUR_OWN_TMDB_READ_ACCESS_TOKEN_HERE",
+  "tvdbApiKey": "",
+  "tv": {
+    "pose": "fan",
+    "fit": "fill",
+    "round": 5,
+    "speed": 0.35,
+    "sort": "title",
+    "language": "en-US"
+  }
+}
