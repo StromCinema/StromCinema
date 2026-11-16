@@ -4,6 +4,12 @@ STRØM for Windows  -  version 0.1.0
 Strøm is a movie shelf with a built-in server and mpv playback. The same
 program also serves your library to the Strøm Android TV app on your network.
 
+
+<img width="2139" height="896" alt="Screenshot 2026-11-16 220541" src="https://github.com/user-attachments/assets/57afe829-1d8f-44ab-a155-1c9ffd4a685a" />
+
+
+
+
 Start Strom.exe. On the first start the settings window opens: add your movie
 folders and (optionally) your TMDB key, then Save.
 
