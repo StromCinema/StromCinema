@@ -1,8 +1,8 @@
 
-STRØM for Windows  -  version 0.1.0
+STRØM CINEMA for Windows  -  version 0.1.0
 =====================================
 
-Strøm is a movie shelf with a built-in server and mpv playback. The same
+Strøm Cinema is a movie shelf with a built-in server and mpv playback. The same
 program also serves your library to the Strøm Android TV app on your network.
 
 
