@@ -1,3 +1,4 @@
+
 STRØM for Windows  -  version 0.1.0
 =====================================
 
@@ -7,6 +8,14 @@ program also serves your library to the Strøm Android TV app on your network.
 
 <img width="2139" height="896" alt="Screenshot 2026-11-16 220541" src="https://github.com/user-attachments/assets/57afe829-1d8f-44ab-a155-1c9ffd4a685a" />
 
+<img width="2182" height="932" alt="Screenshot 2026-11-16 220655" src="https://github.com/user-attachments/assets/be10591e-b895-4533-ae1d-29e86a2e420a" />
+
+<img width="2119" height="909" alt="Screenshot 2026-11-16 220734" src="https://github.com/user-attachments/assets/5059c03c-b159-4832-9df4-eb3bbf28b59c" />
+<img width="2179" height="932" alt="Screenshot 2026-11-16 220713" src="https://github.com/user-attachments/assets/a4f1f362-ccf4-4abb-9c51-ac3b94b35de5" />
+<img width="2160" height="873" alt="Screenshot 2026-11-16 220755" src="https://github.com/user-attachments/assets/f720f20c-6246-4b35-928c-6966959da017" />
+<img width="682" height="658" alt="Screenshot 2026-11-16 220817" src="https://github.com/user-attachments/assets/e5b2a18e-b51a-43a7-bce2-c3adc7c6b99e" />
+
+<img width="989" height="809" alt="Screenshot 2026-11-16 220851" src="https://github.com/user-attachments/assets/9764ef07-3151-4b8a-8822-544c6fad6388" />
 
 
 
